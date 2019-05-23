@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cp ./serverlogs/3_fresh.config ./serverlogs/3.config
+cp ./serverlogs/2_fresh.config ./serverlogs/2.config
+cp ./serverlogs/1_fresh.config ./serverlogs/1.config
+cp ./serverlogs/3_fresh.log ./serverlogs/3.log
+cp ./serverlogs/2_fresh.log ./serverlogs/2.log
+cp ./serverlogs/1_fresh.log ./serverlogs/1.log
+cp ./serverlogs/server_fresh.output ./serverlogs/server.output

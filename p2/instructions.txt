@@ -1,0 +1,13 @@
+gcc -m32 -z execstack -fno-stack-protector -ggdb webserver.c -o webserver
+
+./webserver 8000 &
+
+echo -e "GET /index.html HTTP" | nc 127.0.0.1 8000
+
+env - gdb webserver
+run ./webserver 8000
+break 98
+run 8000
+info frame
+
+gcc -m32 -z execstack -fno-stack-protector -ggdb hacks.c -o hacks
