@@ -109,48 +109,17 @@ void splitBlock(metadata_t* block, metadata_t* leftoverLocation, size_t numbytes
 void coalesceList()
 {
   metadata_t* current = prologue.next;
-  //int offset = 0;
-
-  //printf("Trying to coalescing list to fit %ld\n", numbytes);
   while(current->next != &epilogue)
   {
-    //printf("Current Allocated: %d Current->next Allocated: %d\n",current->isAllocated,current->next->isAllocated);
     if(!isAllocated(current) && !isAllocated(current->next))
     {
-
-      //printf("Current: %p Size: %ld\n",current,current->size);
-      //printf("Current->next: %p Size: %ld\n", current->next,current->next->size);
-
-      //printf("current + METADATA_T_ALIGNED + current->size: %p\n",current + METADATA_T_ALIGNED + current->size );
-      //printf("current->next: %p\n", current->next);
-      //printf("Diff: %ld\n",(current + METADATA_T_ALIGNED + current->size) - current->next);
-    
-      // Coalesce!
-      //printf("We're Coalescing!!! ");
       current->next->prev = NULL;
       current->size = ((current->size >> 1) + (current->next->size >> 1) + METADATA_T_ALIGNED) << 1;
       current->next->next->prev = current;
       current->next = current->next->next;
-      //printf("Coalescing....size of %ld\n",current->size);
-
-      //print_freelist();
-
-      // //printf("Checking if we can split. \n");
-      // if(current->size >= numbytes + METADATA_T_ALIGNED)
-      // {
-      //     offset += METADATA_T_ALIGNED;
-      //     splitBlock(current, (metadata_t*)(heap_region + offset + numbytes),numbytes);
-      //     return heap_region + offset;
-      // }
-      // else
-      // {
-      //   offset += METADATA_T_ALIGNED + current->size;
-      //   current = current->next;
-      // }
     }
     else
     {
-      //offset += METADATA_T_ALIGNED + current->size;
       current = current->next;
     }
   }
@@ -188,35 +157,15 @@ void dfree(void* ptr)
 
 
 bool dmalloc_init() {
-
-  /* Two choices: 
-   * 1. Append prologue and epilogue blocks to the start and the
-   * end of the freelist 
-   *
-   * 2. Initialize freelist pointers to NULL
-   *
-   * Note: We provide the code for 2. Using 1 will help you to tackle the 
-   * corner cases succinctly.
-   */
-
   size_t max_bytes = ALIGN(MAX_HEAP_SIZE);
-  //printf("MAX_BYTES:%ld", max_bytes); // Line for debugging purposess
-  /* returns heap_region, which is initialized to freelist */
+
   freelist = (metadata_t*) mmap(NULL, max_bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   heap_region = (void*)freelist;
-  //printf("Freelist Address: %p\n", freelist);
-  //printf("heap_region Address: %p\n", heap_region);
-  /* Q: Why casting is used? i.e., why (void*)-1? */
   if (freelist == (void *)-1)
     return false;
 
   freelist->next = &epilogue;
   freelist->prev = &prologue;
-  //freelist->isAllocated = 0;
-
-  //printf("Prologue: %p\n",&prologue);
-  //printf("Epilogue: %p\n",&epilogue);
-
   freelist->size = (max_bytes-METADATA_T_ALIGNED) << 1;
 
   // Set up prologue and epilogue
